@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
@@ -37,5 +39,15 @@ public class CategoryController {
     Mono<Category> update(@PathVariable("id") String id, @RequestBody Category category) {
         category.setId(id);
         return categoryRepository.save(category);
+    }
+
+    @PatchMapping("/{id}")
+    Mono<Category> patch(@PathVariable("id") String id, @RequestBody Category category) {
+        Category foundCategory = categoryRepository.findById(id).block();
+        if (!Objects.equals(foundCategory.getDescription(), category.getDescription())) {
+            foundCategory.setDescription(category.getDescription());
+            return  categoryRepository.save(foundCategory);
+        }
+        return Mono.just(foundCategory);
     }
 }

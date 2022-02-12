@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 
 public class CategoryControllerTest {
     WebTestClient webTestClient;
@@ -99,7 +100,7 @@ public class CategoryControllerTest {
                 .expectStatus()
                 .isOk();
 
-        BDDMockito.verify(categoryRepository).save(any());
+        verify(categoryRepository).save(any());
     }
 
     @Test
@@ -119,6 +120,17 @@ public class CategoryControllerTest {
                 .expectStatus()
                 .isOk();
 
-        BDDMockito.verify(categoryRepository, Mockito.never()).save(any());
+        verify(categoryRepository, Mockito.never()).save(any());
+    }
+
+    @Test
+    public void delete() throws Exception {
+        webTestClient
+                .delete()
+                .uri("/api/v1/categories/someId")
+                .exchange()
+                .expectStatus()
+                .isOk();
+        verify(categoryRepository).deleteById(anyString());
     }
 }

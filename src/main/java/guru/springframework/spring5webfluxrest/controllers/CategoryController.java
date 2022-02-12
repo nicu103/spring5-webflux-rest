@@ -50,4 +50,9 @@ public class CategoryController {
         }
         return Mono.just(foundCategory);
     }
+
+    @DeleteMapping("/{id}")
+    Mono<Void> deleteById(@PathVariable("id") String id) {
+        return categoryRepository.deleteById(id);
+    }
 }

@@ -155,4 +155,15 @@ public class VendorControllerTest {
 
         verify(vendorRepository, never()).save(any());
     }
+
+    @Test
+    public void delete() {
+        webTestClient
+                .delete()
+                .uri("/api/v1/vendors/someId")
+                .exchange()
+                .expectStatus()
+                .isOk();
+        verify(vendorRepository).deleteById(anyString());
+    }
 }

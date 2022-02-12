@@ -61,4 +61,9 @@ public class VendorController {
         }
         return Mono.just(foundVendor);
     }
+
+    @DeleteMapping("/{id}")
+    Mono<Void> deleteById(@PathVariable("id") String id) {
+        return vendorRepository.deleteById(id);
+    }
 }

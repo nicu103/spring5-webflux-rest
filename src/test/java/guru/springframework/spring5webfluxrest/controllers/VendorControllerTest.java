@@ -16,6 +16,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class VendorControllerTest {
     WebTestClient webTestClient;
@@ -96,5 +98,61 @@ public class VendorControllerTest {
                 .exchange()
                 .expectStatus()
                 .isOk();
+    }
+
+    @Test
+    public void patchWithChanges() {
+        BDDMockito.given((vendorRepository.findById(anyString())))
+                .willReturn(
+                        Mono.just(
+                                Vendor.builder().firstName("Jenny").lastName("Buck").build()
+                        )
+                );
+
+        BDDMockito.given(vendorRepository.save(any(Vendor.class)))
+                .willReturn(Mono.just(Vendor.builder().build()));
+
+        Mono<Vendor> vendorToSave = Mono.just(
+                Vendor.builder()
+                        .firstName("Janine")
+                        .lastName("Buck")
+                        .build());
+
+        webTestClient.patch()
+                .uri("/api/v1/vendors/someId")
+                .body(vendorToSave, Vendor.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        verify(vendorRepository).save(any());
+    }
+
+    @Test
+    public void patcNoChanges() {
+        BDDMockito.given((vendorRepository.findById(anyString())))
+                .willReturn(
+                        Mono.just(
+                                Vendor.builder().firstName("Jenny").lastName("Buck").build()
+                        )
+                );
+
+        BDDMockito.given(vendorRepository.save(any(Vendor.class)))
+                .willReturn(Mono.just(Vendor.builder().build()));
+
+        Mono<Vendor> vendorToSave = Mono.just(
+                Vendor.builder()
+                        .firstName("Jenny")
+                        .lastName("Buck")
+                        .build());
+
+        webTestClient.patch()
+                .uri("/api/v1/vendors/someId")
+                .body(vendorToSave, Vendor.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        verify(vendorRepository, never()).save(any());
     }
 }
